@@ -2,6 +2,8 @@
 #define NOMINMAX
 #include <windows.h>
 #include <dbgeng.h>
+#include <thread>
+#include <chrono>
 
 #define QUERY_DEBUG_INTERFACE(query, out) \
 	if (const auto result = m_debugClient->QueryInterface(__uuidof(query), reinterpret_cast<void**>(out)); \
@@ -161,6 +163,12 @@ int main(int argc, char** argv)
         std::cout << "WaitForEvent failed" << std::endl;
     }
     std::cout << std::hex << ReadRegister(m_debugRegisters, "rip") << std::endl;
+
+    if (m_debugClient->TerminateProcesses() != S_OK)
+    {
+        std::cout << "TerminateProcesses() failed" << std::endl;
+    }
+    std::cout << "final: " << std::hex << ReadRegister(m_debugRegisters, "rip") << std::endl;
 
     return 0;
 }

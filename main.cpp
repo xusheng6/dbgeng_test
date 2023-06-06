@@ -10,6 +10,32 @@
 		result != S_OK) \
 	throw std::runtime_error("Failed to create " #query)
 
+void DumpAllRegisters(IDebugRegisters* m_debugRegisters)
+{
+    unsigned long register_count {};
+    if (m_debugRegisters->GetNumberRegisters(&register_count) != S_OK)
+    {
+        std::cout << "GetNumberRegisters() failed" << std::endl;
+        return;
+    }
+
+    std::cout << "there are " << register_count << " registers" << std::endl;
+
+    for (std::size_t reg_index {}; reg_index < register_count; reg_index++)
+    {
+        unsigned long reg_length {};
+        DEBUG_REGISTER_DESCRIPTION reg_description {};
+
+        char out[256];
+        if (m_debugRegisters->GetDescription(reg_index, out, 256, &reg_length, &reg_description) != S_OK)
+        {
+            std::cout << "fail to get register with index " << reg_index << std::endl;
+            continue;
+        }
+        std::cout << "register " << reg_index << ", name length: " << reg_length << ", name: " << out << std::endl;
+    }
+}
+
 uint64_t ReadRegister(IDebugRegisters* m_debugRegisters, const std::string& reg)
 {
     unsigned long reg_index{};
